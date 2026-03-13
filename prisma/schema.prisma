@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id_rol      Int       @id @default(autoincrement())
+  nombre      String    @unique
+  descripcion String?
+  usuarios    Usuario[]
+
+  @@map("roles")
+}
+
+model Usuario {
+  id_usuario     Int      @id @default(autoincrement())
+  nombre         String
+  email          String   @unique
+  password       String
+  rol_id         Int
+  rol            Role     @relation(fields: [rol_id], references: [id_rol])
+  activo         Boolean  @default(true)
+  fecha_creacion DateTime @default(now())
+
+  @@map("usuarios")
+}
+
+model Medico {
+  id_medico          Int      @id @default(autoincrement())
+  nombre             String
+  especialidad       String
+  cedula_profesional String   @unique
+  telefono           String?
+  email              String?
+  activo             Boolean  @default(true)
+  citas              Cita[]
+
+  @@map("medicos")
+}
+
+model Paciente {
+  id_paciente      Int      @id @default(autoincrement())
+  nombre           String
+  fecha_nacimiento DateTime
+  telefono         String?
+  tipo_sangre      String?
+  alergias         String?
+  activo           Boolean  @default(true)
+  fecha_registro   DateTime @default(now())
+  citas            Cita[]
+
+  @@map("pacientes")
+}
+
+model Cita {
+  id_cita        Int      @id @default(autoincrement())
+  medico_id      Int
+  medico         Medico   @relation(fields: [medico_id], references: [id_medico])
+  paciente_id    Int
+  paciente       Paciente @relation(fields: [paciente_id], references: [id_paciente])
+  fecha          DateTime
+  hora           DateTime
+  estado         String   @default("Pendiente")
+  motivo         String?
+  fecha_creacion DateTime @default(now())
+
+  @@map("citas")
+}
