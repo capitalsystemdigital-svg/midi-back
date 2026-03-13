@@ -9,9 +9,16 @@ import apiRoutes from "./routes/apiRoutes";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Render usa proxies/balanceadores, esto permite obtener la IP real del cliente si se necesitara
+app.set("trust proxy", 1);
+
 // Middleware de Seguridad y Logging
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
